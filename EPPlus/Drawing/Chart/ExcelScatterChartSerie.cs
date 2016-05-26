@@ -28,6 +28,7 @@
  * ******************************************************************************
  * Jan Källman		Initial Release		        2009-10-01
  * Jan Källman		License changed GPL-->LGPL 2011-12-16
+ * Kenny Nygaard    Added full line style support 2016-05-27
  *******************************************************************************/
 using System;
 using System.Collections.Generic;
@@ -100,6 +101,19 @@ namespace OfficeOpenXml.Drawing.Chart
                 SetXmlNodeString(smoothPath, value.ToString());
             }
         }
+        ExcelDrawingBorder _border = null;
+        /// <summary>
+        /// Line style options.
+        /// </summary>
+        public ExcelDrawingBorder LineBorder
+        {
+            get
+            {
+                if (_border == null)
+                    _border = new ExcelDrawingBorder(NameSpaceManager, TopNode, "c:spPr/a:ln");
+                return _border;
+            }
+        }
         const string markerPath = "c:marker/c:symbol/@val";
         /// <summary>
         /// Marker symbol 
@@ -132,40 +146,6 @@ namespace OfficeOpenXml.Drawing.Chart
 
         //new properties for excel scatter-plots: LineColor, MarkerSize, MarkerColor, LineWidth and MarkerLineColor
         //implemented according to https://epplus.codeplex.com/discussions/287917
-        string LINECOLOR_PATH = "c:spPr/a:ln/a:solidFill/a:srgbClr/@val";
-        /// <summary>
-        /// Line color.
-        /// </summary>
-        ///
-        /// <value>
-        /// The color of the line.
-        /// </value>
-        public Color LineColor
-        {
-            get
-            {
-                string color = GetXmlNodeString(LINECOLOR_PATH);
-                if (color == "")
-                {
-                    return Color.Black;
-                }
-                else
-                {
-                    Color c = Color.FromArgb(Convert.ToInt32(color, 16));
-                    int a = getAlphaChannel(LINECOLOR_PATH);
-                    if (a != 255)
-                    {
-                        c = Color.FromArgb(a, c);
-                    }
-                    return c;
-                }
-            }
-            set
-            {
-                SetXmlNodeString(LINECOLOR_PATH, value.ToArgb().ToString("X8").Substring(2), true);
-                setAlphaChannel(value, LINECOLOR_PATH);
-            }
-        }
         string MARKERSIZE_PATH = "c:marker/c:size/@val";
         /// <summary>
         /// Gets or sets the size of the marker.
@@ -235,33 +215,6 @@ namespace OfficeOpenXml.Drawing.Chart
             }
         }
 
-        string LINEWIDTH_PATH = "c:spPr/a:ln/@w";
-        /// <summary>
-        /// Gets or sets the width of the line in pt.
-        /// </summary>
-        ///
-        /// <value>
-        /// The width of the line.
-        /// </value>
-        public double LineWidth
-        {
-            get
-            {
-                string size = GetXmlNodeString(LINEWIDTH_PATH);
-                if (size == "")
-                {
-                    return 2.25;
-                }
-                else
-                {
-                    return double.Parse(GetXmlNodeString(LINEWIDTH_PATH)) / 12700;
-                }
-            }
-            set
-            {
-                SetXmlNodeString(LINEWIDTH_PATH, (( int )(12700 * value)).ToString(), true);
-            }
-        }
         //marker line color
         string MARKERLINECOLOR_PATH = "c:marker/c:spPr/a:ln/a:solidFill/a:srgbClr/@val";
         /// <summary>
