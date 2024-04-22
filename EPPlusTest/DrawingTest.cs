@@ -832,6 +832,48 @@ namespace EPPlusTest
             wsChart.Chart.Series[0].Header = "Serie";
             _pck.SaveAs(new FileInfo(@"c:\temp\chart.xlsx"));
         }
+
+        [Ignore]
+        [TestMethod]
+        public void ChartWorksheetSeriesIndex()
+        {
+            _pck = new ExcelPackage();
+            var wsChart = _pck.Workbook.Worksheets.AddChart("chart", eChartType.XYScatterLines);
+            var ws = _pck.Workbook.Worksheets.Add("data");
+            AddTestSerie(ws, wsChart.Chart);
+            wsChart.Chart.Style = eChartStyle.Style23;
+            wsChart.Chart.Title.Text = "Chart worksheet";
+            wsChart.Chart.Series[0].Header = "Serie";
+
+            var wsChart2 = wsChart.Chart.PlotArea.ChartTypes.Add(eChartType.XYScatterLinesNoMarkers);
+            AddTestSerie(ws, wsChart2);
+
+            Assert.AreEqual(0, wsChart.Chart.Series[0].GetXmlNodeInt("c:idx/@val"));
+            Assert.AreEqual(1, wsChart2.Series[0].GetXmlNodeInt("c:idx/@val"));
+
+
+            wsChart.Chart.Series.Add("'" + ws.Name + "'!U19:U24", "'" + ws.Name + "'!W19:W24");
+
+            Assert.AreEqual(0, wsChart.Chart.Series[0].GetXmlNodeInt("c:idx/@val"));
+            Assert.AreEqual(1, wsChart.Chart.Series[1].GetXmlNodeInt("c:idx/@val"));
+            Assert.AreEqual(2, wsChart2.Series[0].GetXmlNodeInt("c:idx/@val"));
+
+            wsChart2.Series.Add("'" + ws.Name + "'!U19:U24", "'" + ws.Name + "'!W19:W24");
+
+            Assert.AreEqual(0, wsChart.Chart.Series[0].GetXmlNodeInt("c:idx/@val"));
+            Assert.AreEqual(1, wsChart.Chart.Series[1].GetXmlNodeInt("c:idx/@val"));
+            Assert.AreEqual(2, wsChart2.Series[0].GetXmlNodeInt("c:idx/@val"));
+            Assert.AreEqual(3, wsChart2.Series[1].GetXmlNodeInt("c:idx/@val"));
+
+            wsChart.Chart.Series.Add("'" + ws.Name + "'!V19:V24", "'" + ws.Name + "'!W19:W24");
+
+            Assert.AreEqual(0, wsChart.Chart.Series[0].GetXmlNodeInt("c:idx/@val"));
+            Assert.AreEqual(1, wsChart.Chart.Series[1].GetXmlNodeInt("c:idx/@val"));
+            Assert.AreEqual(2, wsChart.Chart.Series[2].GetXmlNodeInt("c:idx/@val"));
+            Assert.AreEqual(3, wsChart2.Series[0].GetXmlNodeInt("c:idx/@val"));
+            Assert.AreEqual(4, wsChart2.Series[1].GetXmlNodeInt("c:idx/@val"));
+        }
+
         [Ignore]
         [TestMethod]
         public void ReadChartWorksheet()
