@@ -309,7 +309,7 @@ namespace OfficeOpenXml.Drawing.Chart
                    {
                        foreach (ExcelChartSerie serie in chart.Series)
                        {
-                           serie.SetID((++newID).ToString());
+                           serie.SetID((newID++).ToString());
                        }
                    }
                    else
