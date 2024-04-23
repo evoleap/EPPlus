@@ -833,7 +833,6 @@ namespace EPPlusTest
             _pck.SaveAs(new FileInfo(@"c:\temp\chart.xlsx"));
         }
 
-        [Ignore]
         [TestMethod]
         public void ChartWorksheetSeriesIndex()
         {
